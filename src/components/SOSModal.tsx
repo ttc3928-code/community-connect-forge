@@ -114,7 +114,9 @@ export const SOSModal: React.FC<SOSModalProps> = ({ open, onOpenChange }) => {
   useEffect(() => {
     if (!open) return;
     setView('menu');
+    setEditContact(false);
     setVerse(SWORD_VERSES[Math.floor(Math.random() * SWORD_VERSES.length)]);
+
     if (!initialized.current) {
       try {
         const saved = localStorage.getItem(PARTNER_KEY);
