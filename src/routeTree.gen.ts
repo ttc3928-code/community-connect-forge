@@ -19,6 +19,7 @@ import { Route as HelpRouteImport } from './routes/help'
 import { Route as JournalRouteImport } from './routes/journal'
 import { Route as MyCircleRouteImport } from './routes/my-circle'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SurrenderRouteImport } from './routes/surrender'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -73,6 +74,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/journal': typeof JournalRoute
   '/my-circle': typeof MyCircleRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/surrender': typeof SurrenderRoute
   '/terms': typeof TermsRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/journal': typeof JournalRoute
   '/my-circle': typeof MyCircleRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/surrender': typeof SurrenderRoute
   '/terms': typeof TermsRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/journal': typeof JournalRoute
   '/my-circle': typeof MyCircleRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/surrender': typeof SurrenderRoute
   '/terms': typeof TermsRoute
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/my-circle'
     | '/privacy'
+    | '/profile'
     | '/reset-password'
     | '/surrender'
     | '/terms'
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/my-circle'
     | '/privacy'
+    | '/profile'
     | '/reset-password'
     | '/surrender'
     | '/terms'
@@ -178,6 +189,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/my-circle'
     | '/privacy'
+    | '/profile'
     | '/reset-password'
     | '/surrender'
     | '/terms'
@@ -194,6 +206,7 @@ export interface RootRouteChildren {
   JournalRoute: typeof JournalRoute
   MyCircleRoute: typeof MyCircleRoute
   PrivacyRoute: typeof PrivacyRoute
+  ProfileRoute: typeof ProfileRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SurrenderRoute: typeof SurrenderRoute
   TermsRoute: typeof TermsRoute
@@ -271,6 +284,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
@@ -306,6 +326,7 @@ const rootRouteChildren: RootRouteChildren = {
   JournalRoute: JournalRoute,
   MyCircleRoute: MyCircleRoute,
   PrivacyRoute: PrivacyRoute,
+  ProfileRoute: ProfileRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SurrenderRoute: SurrenderRoute,
   TermsRoute: TermsRoute,

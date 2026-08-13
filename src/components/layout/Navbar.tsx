@@ -2,7 +2,15 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from '@/lib/router-compat';
 import { Button } from '@/components/ui/button';
 import { ShieldIcon } from '@/components/icons/ShieldIcon';
-import { Menu, X, Lock, LogOut, User, LifeBuoy } from 'lucide-react';
+import { Menu, X, Lock, LogOut, User, LifeBuoy, Settings, ChevronDown } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -101,19 +109,32 @@ export const Navbar: React.FC = () => {
               <span className="hidden sm:inline">Emergency</span>
             </Button>
             {!loading && user ? (
-              <>
-                <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary/50">
-                  <User className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium truncate max-w-32">
-                    {user.email?.split('@')[0]}
-                  </span>
-                </div>
-                <Button variant="ghost" size="sm" onClick={handleSignOut} className="hidden lg:flex">
-                  <LogOut className="w-4 h-4 mr-1" />
-                  Sign Out
-                </Button>
-              </>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors">
+                    <User className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-medium truncate max-w-32">
+                      {user.email?.split('@')[0]}
+                    </span>
+                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="cursor-pointer">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Profile / Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
+
               <>
                 <Link to="/auth?mode=signin">
                   <Button variant="ghost" size="sm">Sign In</Button>
@@ -184,7 +205,14 @@ export const Navbar: React.FC = () => {
                       <User className="w-4 h-4" />
                       <span className="truncate">{user.email}</span>
                     </div>
+                    <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="outline" className="w-full mb-2">
+                        <Settings className="w-4 h-4 mr-2" />
+                        Profile / Settings
+                      </Button>
+                    </Link>
                     <Button variant="outline" className="w-full" onClick={handleSignOut}>
+
                       <LogOut className="w-4 h-4 mr-2" />
                       Sign Out
                     </Button>
