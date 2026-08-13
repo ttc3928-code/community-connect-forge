@@ -205,7 +205,14 @@ export const Navbar: React.FC = () => {
                       <User className="w-4 h-4" />
                       <span className="truncate">{user.email}</span>
                     </div>
+                    <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="outline" className="w-full mb-2">
+                        <Settings className="w-4 h-4 mr-2" />
+                        Profile / Settings
+                      </Button>
+                    </Link>
                     <Button variant="outline" className="w-full" onClick={handleSignOut}>
+
                       <LogOut className="w-4 h-4 mr-2" />
                       Sign Out
                     </Button>
