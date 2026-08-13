@@ -275,10 +275,7 @@ export const SOSModal: React.FC<SOSModalProps> = ({ open, onOpenChange }) => {
             {view === 'breathe' && (
               <>
                 <h3 className="text-center font-heading text-xl font-bold uppercase">Box Breathing</h3>
-                <BreathingExercise />
-                <Button className="w-full" onClick={() => setView('sword')}>
-                  I'm steadier — give me the Word
-                </Button>
+                <BreathingExercise onGrounded={() => setView('sword')} onNeedHelp={() => setView('call')} />
               </>
             )}
 
