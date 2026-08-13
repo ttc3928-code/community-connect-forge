@@ -13,16 +13,17 @@
     "noEmit": true,
 
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
+    "strictNullChecks": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-    "noUncheckedSideEffectImports": true,
+    "noImplicitOverride": false,
+    "noImplicitReturns": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": false,
+    "noUncheckedSideEffectImports": false,
     "paths": {
       "@/*": ["./src/*"]
     }

@@ -1,0 +1,8 @@
+CREATE POLICY "Members view their own journal images" ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'journal-images' AND (storage.foldername(name))[1] = auth.uid()::text);
+CREATE POLICY "Members upload their own journal images" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'journal-images' AND (storage.foldername(name))[1] = auth.uid()::text);
+CREATE POLICY "Members update their own journal images" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'journal-images' AND (storage.foldername(name))[1] = auth.uid()::text) WITH CHECK (bucket_id = 'journal-images' AND (storage.foldername(name))[1] = auth.uid()::text);
+CREATE POLICY "Members delete their own journal images" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'journal-images' AND (storage.foldername(name))[1] = auth.uid()::text);
+CREATE POLICY "Members view their own habit icons" ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'habit-icons' AND (storage.foldername(name))[1] = auth.uid()::text);
+CREATE POLICY "Members upload their own habit icons" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'habit-icons' AND (storage.foldername(name))[1] = auth.uid()::text);
+CREATE POLICY "Members update their own habit icons" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'habit-icons' AND (storage.foldername(name))[1] = auth.uid()::text) WITH CHECK (bucket_id = 'habit-icons' AND (storage.foldername(name))[1] = auth.uid()::text);
+CREATE POLICY "Members delete their own habit icons" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'habit-icons' AND (storage.foldername(name))[1] = auth.uid()::text);
