@@ -160,11 +160,14 @@ export const SOSModal: React.FC<SOSModalProps> = ({ open, onOpenChange }) => {
       },
       {
         onSuccess: () => {
-          toast.success('Logged. Awareness is armor.');
+          toast.success('🏆 Victory Logged! Now step away — do your 15 pushups.', {
+            duration: 6000,
+          });
           setNote('');
           setTrigger(null);
-          setView('menu');
+          setView('logged');
         },
+
         onError: () => toast.error('Could not save the entry'),
       },
     );
