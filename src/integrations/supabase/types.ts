@@ -143,6 +143,9 @@ export type Database = {
           display_name: string | null
           id: string
           longest_streak: number | null
+          partner_name: string | null
+          partner_phone: string | null
+          sos_attach_location: boolean
           streak_count: number | null
           updated_at: string
           user_id: string
@@ -153,6 +156,9 @@ export type Database = {
           display_name?: string | null
           id?: string
           longest_streak?: number | null
+          partner_name?: string | null
+          partner_phone?: string | null
+          sos_attach_location?: boolean
           streak_count?: number | null
           updated_at?: string
           user_id: string
@@ -163,6 +169,9 @@ export type Database = {
           display_name?: string | null
           id?: string
           longest_streak?: number | null
+          partner_name?: string | null
+          partner_phone?: string | null
+          sos_attach_location?: boolean
           streak_count?: number | null
           updated_at?: string
           user_id?: string
