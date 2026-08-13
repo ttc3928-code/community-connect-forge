@@ -234,7 +234,11 @@ export const SOSModal: React.FC<SOSModalProps> = ({ open, onOpenChange }) => {
                     className="w-full justify-start gap-3 h-14"
                     onClick={() => setView('call')}
                   >
-                    <Phone className="h-5 w-5" /> Call / Text a Brother
+                    <Phone className="h-5 w-5" />{' '}
+                    {partner.phone
+                      ? `Call ${partner.name || 'your brother'} — 1 tap`
+                      : 'Call / Text a Brother'}
+
                   </Button>
                   <Button
                     variant="ghost"
