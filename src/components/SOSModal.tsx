@@ -11,6 +11,8 @@ import {
   PenLine,
   ArrowLeft,
   ShieldCheck,
+  MessageSquare,
+  Trophy,
   X,
 } from 'lucide-react';
 import { useCreateJournalEntry } from '@/hooks/useJournalEntries';
@@ -20,7 +22,8 @@ interface SOSModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-type View = 'menu' | 'breathe' | 'sword' | 'call' | 'log';
+type View = 'menu' | 'breathe' | 'sword' | 'call' | 'log' | 'logged';
+
 
 const SWORD_VERSES = [
   {
