@@ -106,6 +106,8 @@ export const SOSModal: React.FC<SOSModalProps> = ({ open, onOpenChange }) => {
   const [partner, setPartner] = useState({ name: '', phone: '' });
   const [trigger, setTrigger] = useState<string | null>(null);
   const [note, setNote] = useState('');
+  const [editContact, setEditContact] = useState(false);
+
   const createEntry = useCreateJournalEntry();
   const initialized = useRef(false);
 
