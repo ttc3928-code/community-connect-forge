@@ -2,7 +2,15 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from '@/lib/router-compat';
 import { Button } from '@/components/ui/button';
 import { ShieldIcon } from '@/components/icons/ShieldIcon';
-import { Menu, X, Lock, LogOut, User, LifeBuoy } from 'lucide-react';
+import { Menu, X, Lock, LogOut, User, LifeBuoy, Settings, ChevronDown } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
