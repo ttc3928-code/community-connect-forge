@@ -129,11 +129,13 @@ export const SOSModal: React.FC<SOSModalProps> = ({ open, onOpenChange }) => {
   const savePartner = () => {
     try {
       localStorage.setItem(PARTNER_KEY, JSON.stringify(partner));
+      setEditContact(false);
       toast.success('Accountability contact saved');
     } catch {
       toast.error('Could not save contact');
     }
   };
+
 
   const logVictory = () => {
     createEntry.mutate(
