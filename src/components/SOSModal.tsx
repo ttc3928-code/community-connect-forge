@@ -65,37 +65,58 @@ const BOX_PHASES = [
   { label: 'Hold', scale: 0.75 },
 ] as const;
 
-const BreathingExercise: React.FC = () => {
+const BreathingExercise: React.FC<{ onNeedHelp: () => void; onGrounded: () => void }> = ({ onNeedHelp, onGrounded }) => {
   const [elapsed, setElapsed] = useState(0);
+  const [completed, setCompleted] = useState(false);
 
   useEffect(() => {
-    const id = setInterval(() => setElapsed((e) => e + 1), 1000);
+    if (completed) return;
+    const id = setInterval(() => {
+      setElapsed((e) => {
+        const next = e + 1;
+        if (next >= 60) {
+          clearInterval(id);
+          setCompleted(true);
+        }
+        return next;
+      });
+    }, 1000);
     return () => clearInterval(id);
-  }, []);
+  }, [completed]);
 
   const total = 60;
   const remaining = Math.max(total - elapsed, 0);
   const phase = BOX_PHASES[Math.floor(elapsed / 4) % 4];
-  const countInPhase = 4 - (elapsed % 4);
+  const countInPhase = completed ? 0 : 4 - (elapsed % 4);
 
   return (
     <div className="flex flex-col items-center gap-6 py-4">
       <div className="relative flex h-52 w-52 items-center justify-center">
         <motion.div
           className="absolute inset-0 rounded-full bg-primary/10 border-2 border-primary/40"
-          animate={{ scale: phase.scale }}
+          animate={completed ? { scale: 1 } : { scale: phase.scale }}
           transition={{ duration: 4, ease: 'easeInOut' }}
         />
         <div className="relative text-center">
           <p className="font-heading text-2xl font-bold uppercase tracking-widest text-primary">
-            {phase.label}
+            {completed ? 'Done' : phase.label}
           </p>
-          <p className="text-4xl font-bold text-foreground">{countInPhase}</p>
+          <p className="text-4xl font-bold text-foreground">{completed ? '✓' : countInPhase}</p>
         </div>
       </div>
       <p className="text-sm text-muted-foreground">
-        {remaining > 0 ? `${remaining}s remaining — 4 in, 4 hold, 4 out, 4 hold` : 'Reset complete. You made it.'}
+        {completed ? '60 seconds complete. You made it.' : `${remaining}s remaining — 4 in, 4 hold, 4 out, 4 hold`}
       </p>
+      {completed && (
+        <div className="w-full space-y-3">
+          <Button className="w-full h-14" onClick={onGrounded}>
+            I Feel Grounded
+          </Button>
+          <Button variant="outline" className="w-full" onClick={onNeedHelp}>
+            I Still Need Help
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
