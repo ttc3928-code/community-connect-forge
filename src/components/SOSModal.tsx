@@ -276,40 +276,52 @@ export const SOSModal: React.FC<SOSModalProps> = ({ open, onOpenChange }) => {
                   <div className="space-y-3">
                     <a href={`tel:${partner.phone}`} className="block">
                       <Button className="w-full h-14 gap-2">
-                        <Phone className="h-5 w-5" /> Call {partner.name || 'your brother'}
+                        <Phone className="h-5 w-5" /> Call {partner.name || 'your brother'} (Accountability Partner)
                       </Button>
                     </a>
                     <a
                       href={`sms:${partner.phone}?&body=${encodeURIComponent(
-                        "I'm struggling right now and need prayer. Can you talk?",
+                        "Emergency check-in: I'm in the fight right now and need prayer. Can you talk?",
                       )}`}
                       className="block"
                     >
-                      <Button variant="outline" className="w-full">
-                        Send a text instead
+                      <Button variant="outline" className="w-full h-14 gap-2">
+                        <MessageSquare className="h-5 w-5" /> Text Emergency Alert
                       </Button>
                     </a>
+                    {!editContact && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => setEditContact(true)}
+                      >
+                        Change contact
+                      </Button>
+                    )}
                   </div>
                 ) : null}
-                <div className="space-y-2 pt-2">
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                    {partner.phone ? 'Update contact' : 'Add your accountability contact'}
-                  </p>
-                  <Input
-                    placeholder="Name"
-                    value={partner.name}
-                    onChange={(e) => setPartner((p) => ({ ...p, name: e.target.value }))}
-                  />
-                  <Input
-                    placeholder="Phone number"
-                    inputMode="tel"
-                    value={partner.phone}
-                    onChange={(e) => setPartner((p) => ({ ...p, phone: e.target.value }))}
-                  />
-                  <Button variant="outline" className="w-full" onClick={savePartner}>
-                    Save contact
-                  </Button>
-                </div>
+                {(!partner.phone || editContact) && (
+                  <div className="space-y-2 pt-2">
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                      {partner.phone ? 'Update contact' : 'Add your accountability contact'}
+                    </p>
+                    <Input
+                      placeholder="Name"
+                      value={partner.name}
+                      onChange={(e) => setPartner((p) => ({ ...p, name: e.target.value }))}
+                    />
+                    <Input
+                      placeholder="Phone number"
+                      inputMode="tel"
+                      value={partner.phone}
+                      onChange={(e) => setPartner((p) => ({ ...p, phone: e.target.value }))}
+                    />
+                    <Button variant="outline" className="w-full" onClick={savePartner}>
+                      Save contact
+                    </Button>
+                  </div>
+                )}
               </>
             )}
 
@@ -342,6 +354,35 @@ export const SOSModal: React.FC<SOSModalProps> = ({ open, onOpenChange }) => {
                 </p>
               </>
             )}
+
+            {view === 'logged' && (
+              <div className="space-y-5 py-2 text-center">
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 260, damping: 18 }}
+                  className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/15"
+                >
+                  <Trophy className="h-8 w-8 text-primary" />
+                </motion.div>
+                <h3 className="font-heading text-2xl font-bold uppercase tracking-wide">
+                  Victory Logged!
+                </h3>
+                <p className="text-base font-medium text-foreground">
+                  Now step away — do your 15 pushups.
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Cold water on your face or 2 minutes outside works too. Move now.
+                </p>
+                <Button className="w-full h-14" onClick={() => onOpenChange(false)}>
+                  I'm moving
+                </Button>
+                <Button variant="ghost" className="w-full" onClick={() => setView('menu')}>
+                  Back to tools
+                </Button>
+              </div>
+            )}
+
           </motion.div>
         </AnimatePresence>
       </DialogContent>
