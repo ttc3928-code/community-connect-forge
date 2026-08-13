@@ -396,19 +396,22 @@ export const SOSModal: React.FC<SOSModalProps> = ({ open, onOpenChange }) => {
                   <Trophy className="h-8 w-8 text-primary" />
                 </motion.div>
                 <h3 className="font-heading text-2xl font-bold uppercase tracking-wide">
-                  Victory Logged!
+                  🏆 Trigger Logged
                 </h3>
                 <p className="text-base font-medium text-foreground">
-                  Now step away — do your 15 pushups.
+                  Step away, do 15 pushups, or splash cold water on your face.
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  Cold water on your face or 2 minutes outside works too. Move now.
-                </p>
-                <Button className="w-full h-14" onClick={() => onOpenChange(false)}>
-                  I'm moving
+                <Button
+                  className="w-full h-14"
+                  onClick={() => {
+                    toast.success('Victory logged. Well fought.', { duration: 5000 });
+                    onOpenChange(false);
+                  }}
+                >
+                  I'm Good - Return to Dashboard
                 </Button>
-                <Button variant="ghost" className="w-full" onClick={() => setView('menu')}>
-                  Back to tools
+                <Button variant="outline" className="w-full" onClick={() => setView('call')}>
+                  I Still Need Help
                 </Button>
               </div>
             )}
