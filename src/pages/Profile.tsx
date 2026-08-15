@@ -33,6 +33,9 @@ import {
   MapPin,
   Smartphone,
   MessageSquare,
+  Send,
+  Check,
+  AlertCircle,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile, useUpdateProfile } from '@/hooks/useProfile';
@@ -76,6 +79,9 @@ const Profile: React.FC = () => {
   const [attachLocation, setAttachLocation] = useState(false);
   const [reminderTime, setReminderTime] = useState('07:00');
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [sosTouched, setSosTouched] = useState(false);
+  const [sosSaved, setSosSaved] = useState(false);
+  const [reminderSaved, setReminderSaved] = useState(false);
 
   useEffect(() => {
     if (!profile) return;
@@ -99,9 +105,31 @@ const Profile: React.FC = () => {
     );
   };
 
+  const digitCount = partnerPhone.replace(/\D/g, '').length;
+  const phoneError = !partnerPhone.trim()
+    ? 'Phone number is required for 1-tap SOS alerts.'
+    : !/^\+?[\d\s()\-.]+$/.test(partnerPhone.trim())
+      ? 'Only digits, spaces, +, -, ( ) and . are allowed.'
+      : digitCount < 7
+        ? 'Phone number is too short — include the area code.'
+        : digitCount > 15
+          ? 'Phone number is too long.'
+          : null;
+  const nameError = !partnerName.trim()
+    ? 'Partner name is required so the alert is personal.'
+    : partnerName.trim().length < 2
+      ? 'Enter at least 2 characters.'
+      : null;
+  const sosValid = !phoneError && !nameError;
+
+  const reminderError = !/^([01]\d|2[0-3]):[0-5]\d$/.test(reminderTime)
+    ? 'Pick a valid time (HH:MM).'
+    : null;
+
   const handleSaveSOS = () => {
-    if (partnerPhone && !/^[+\d][\d\s()\-.]{5,24}$/.test(partnerPhone.trim())) {
-      toast.error('Enter a valid phone number');
+    setSosTouched(true);
+    if (!sosValid) {
+      toast.error(nameError ?? phoneError ?? 'Check your emergency settings');
       return;
     }
     updateProfile.mutate(
@@ -111,7 +139,11 @@ const Profile: React.FC = () => {
         sos_attach_location: attachLocation,
       } as any,
       {
-        onSuccess: () => toast.success('Emergency settings saved'),
+        onSuccess: () => {
+          setSosSaved(true);
+          setTimeout(() => setSosSaved(false), 2500);
+          toast.success('Emergency settings saved');
+        },
         onError: () => toast.error('Could not save emergency settings'),
       },
     );
@@ -123,11 +155,26 @@ const Profile: React.FC = () => {
     ? `Hey ${partnerFallback}, I'm using the SOS tool on Iron Sharpens Iron. Facing a strong urge right now and need support. Location: ${sampleLocation}`
     : `Hey ${partnerFallback}, I'm using the SOS tool on Iron Sharpens Iron. Facing a strong urge right now and could use a quick call or text.`;
 
+  const handleTestSMS = () => {
+    const body = encodeURIComponent(`[TEST] ${smsPreview}`);
+    const to = phoneError ? '' : partnerPhone.trim().replace(/[^\d+]/g, '');
+    const separator = /iPhone|iPad|Macintosh/.test(navigator.userAgent) ? '&' : '?';
+    window.location.href = `sms:${to}${separator}body=${body}`;
+  };
+
   const handleSaveReminder = () => {
+    if (reminderError) {
+      toast.error(reminderError);
+      return;
+    }
     updatePrefs.mutate(
       { reminder_time: `${reminderTime}:00`, habit_reminders_enabled: true },
       {
-        onSuccess: () => toast.success(`Morning reminder set for ${reminderTime}`),
+        onSuccess: () => {
+          setReminderSaved(true);
+          setTimeout(() => setReminderSaved(false), 2500);
+          toast.success(`Morning reminder set for ${reminderTime}`);
+        },
         onError: () => toast.error('Could not save reminder time'),
       },
     );
@@ -266,9 +313,18 @@ const Profile: React.FC = () => {
                     id="partnerName"
                     value={partnerName}
                     maxLength={60}
+                    onBlur={() => setSosTouched(true)}
                     onChange={(e) => setPartnerName(e.target.value)}
                     placeholder="John"
+                    aria-invalid={sosTouched && !!nameError}
+                    className={sosTouched && nameError ? 'border-destructive focus-visible:ring-destructive' : ''}
                   />
+                  {sosTouched && nameError && (
+                    <p className="flex items-center gap-1.5 text-xs text-destructive">
+                      <AlertCircle className="h-3.5 w-3.5" />
+                      {nameError}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="partnerPhone">Phone Number</Label>
@@ -277,9 +333,22 @@ const Profile: React.FC = () => {
                     type="tel"
                     value={partnerPhone}
                     maxLength={25}
+                    onBlur={() => setSosTouched(true)}
                     onChange={(e) => setPartnerPhone(e.target.value)}
                     placeholder="+1 555 123 4567"
+                    aria-invalid={sosTouched && !!phoneError}
+                    className={sosTouched && phoneError ? 'border-destructive focus-visible:ring-destructive' : ''}
                   />
+                  {sosTouched && phoneError ? (
+                    <p className="flex items-center gap-1.5 text-xs text-destructive">
+                      <AlertCircle className="h-3.5 w-3.5" />
+                      {phoneError}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      Include country/area code, e.g. +1 555 123 4567.
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="flex items-start justify-between gap-4 rounded-lg border border-border bg-muted/30 p-3">
@@ -296,9 +365,30 @@ const Profile: React.FC = () => {
                 </div>
                 <Switch checked={attachLocation} onCheckedChange={setAttachLocation} />
               </div>
-              <Button onClick={handleSaveSOS} disabled={updateProfile.isPending}>
-                Save Emergency Settings
-              </Button>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  onClick={handleSaveSOS}
+                  disabled={updateProfile.isPending || (sosTouched && !sosValid)}
+                >
+                  {updateProfile.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving…
+                    </>
+                  ) : sosSaved ? (
+                    <>
+                      <Check className="mr-2 h-4 w-4" />
+                      Saved
+                    </>
+                  ) : (
+                    'Save Emergency Settings'
+                  )}
+                </Button>
+                <Button variant="outline" onClick={handleTestSMS}>
+                  <Send className="mr-2 h-4 w-4" />
+                  Send Test SMS to Myself/Partner
+                </Button>
+              </div>
 
               <div className="space-y-3 rounded-xl border border-primary/30 bg-slate-900/60 p-4">
                 <div className="flex items-center gap-2">
@@ -340,11 +430,33 @@ const Profile: React.FC = () => {
                   type="time"
                   value={reminderTime}
                   onChange={(e) => setReminderTime(e.target.value)}
-                  className="max-w-40"
+                  aria-invalid={!!reminderError}
+                  className={`max-w-40 ${reminderError ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 />
+                {reminderError && (
+                  <p className="flex items-center gap-1.5 text-xs text-destructive">
+                    <AlertCircle className="h-3.5 w-3.5" />
+                    {reminderError}
+                  </p>
+                )}
               </div>
-              <Button onClick={handleSaveReminder} disabled={updatePrefs.isPending}>
-                Save Reminder Time
+              <Button
+                onClick={handleSaveReminder}
+                disabled={updatePrefs.isPending || !!reminderError}
+              >
+                {updatePrefs.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving…
+                  </>
+                ) : reminderSaved ? (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Saved
+                  </>
+                ) : (
+                  'Save Reminder Time'
+                )}
               </Button>
             </SectionCard>
 
