@@ -79,6 +79,9 @@ const Profile: React.FC = () => {
   const [attachLocation, setAttachLocation] = useState(false);
   const [reminderTime, setReminderTime] = useState('07:00');
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [sosTouched, setSosTouched] = useState(false);
+  const [sosSaved, setSosSaved] = useState(false);
+  const [reminderSaved, setReminderSaved] = useState(false);
 
   useEffect(() => {
     if (!profile) return;
