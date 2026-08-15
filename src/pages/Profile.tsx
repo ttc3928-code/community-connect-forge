@@ -31,6 +31,8 @@ import {
   Trash2,
   Loader2,
   MapPin,
+  Smartphone,
+  MessageSquare,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile, useUpdateProfile } from '@/hooks/useProfile';
