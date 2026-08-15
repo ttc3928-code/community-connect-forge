@@ -33,6 +33,9 @@ import {
   MapPin,
   Smartphone,
   MessageSquare,
+  Send,
+  Check,
+  AlertCircle,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile, useUpdateProfile } from '@/hooks/useProfile';
