@@ -365,9 +365,30 @@ const Profile: React.FC = () => {
                 </div>
                 <Switch checked={attachLocation} onCheckedChange={setAttachLocation} />
               </div>
-              <Button onClick={handleSaveSOS} disabled={updateProfile.isPending}>
-                Save Emergency Settings
-              </Button>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  onClick={handleSaveSOS}
+                  disabled={updateProfile.isPending || (sosTouched && !sosValid)}
+                >
+                  {updateProfile.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving…
+                    </>
+                  ) : sosSaved ? (
+                    <>
+                      <Check className="mr-2 h-4 w-4" />
+                      Saved
+                    </>
+                  ) : (
+                    'Save Emergency Settings'
+                  )}
+                </Button>
+                <Button variant="outline" onClick={handleTestSMS}>
+                  <Send className="mr-2 h-4 w-4" />
+                  Send Test SMS to Myself/Partner
+                </Button>
+              </div>
 
               <div className="space-y-3 rounded-xl border border-primary/30 bg-slate-900/60 p-4">
                 <div className="flex items-center gap-2">
