@@ -313,9 +313,18 @@ const Profile: React.FC = () => {
                     id="partnerName"
                     value={partnerName}
                     maxLength={60}
+                    onBlur={() => setSosTouched(true)}
                     onChange={(e) => setPartnerName(e.target.value)}
                     placeholder="John"
+                    aria-invalid={sosTouched && !!nameError}
+                    className={sosTouched && nameError ? 'border-destructive focus-visible:ring-destructive' : ''}
                   />
+                  {sosTouched && nameError && (
+                    <p className="flex items-center gap-1.5 text-xs text-destructive">
+                      <AlertCircle className="h-3.5 w-3.5" />
+                      {nameError}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="partnerPhone">Phone Number</Label>
@@ -324,9 +333,22 @@ const Profile: React.FC = () => {
                     type="tel"
                     value={partnerPhone}
                     maxLength={25}
+                    onBlur={() => setSosTouched(true)}
                     onChange={(e) => setPartnerPhone(e.target.value)}
                     placeholder="+1 555 123 4567"
+                    aria-invalid={sosTouched && !!phoneError}
+                    className={sosTouched && phoneError ? 'border-destructive focus-visible:ring-destructive' : ''}
                   />
+                  {sosTouched && phoneError ? (
+                    <p className="flex items-center gap-1.5 text-xs text-destructive">
+                      <AlertCircle className="h-3.5 w-3.5" />
+                      {phoneError}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      Include country/area code, e.g. +1 555 123 4567.
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="flex items-start justify-between gap-4 rounded-lg border border-border bg-muted/30 p-3">
