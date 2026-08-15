@@ -299,6 +299,34 @@ const Profile: React.FC = () => {
               <Button onClick={handleSaveSOS} disabled={updateProfile.isPending}>
                 Save Emergency Settings
               </Button>
+
+              <div className="space-y-3 rounded-xl border border-primary/30 bg-slate-900/60 p-4">
+                <div className="flex items-center gap-2">
+                  <Smartphone className="h-4 w-4 text-primary" />
+                  <p className="text-sm font-semibold text-foreground">SOS SMS Preview</p>
+                  <span className="ml-auto rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                    {attachLocation ? 'With location' : 'No location'}
+                  </span>
+                </div>
+                <div className="flex justify-start">
+                  <div className="relative max-w-[92%] rounded-2xl rounded-tl-sm border border-primary/40 bg-slate-800/90 px-4 py-3 shadow-sm">
+                    <div className="absolute -left-1.5 top-0 h-3 w-3 -translate-y-1/2 rotate-45 rounded-sm bg-slate-800/90" />
+                    <div className="relative flex items-start gap-2">
+                      <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                      <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                        {smsPreview}
+                      </p>
+                    </div>
+                    <p className="relative mt-2 text-right text-[10px] text-muted-foreground">
+                      SMS · now
+                    </p>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  This is the exact message your accountability partner will receive when you tap
+                  “Send Text Alert” in the SOS modal.
+                </p>
+              </div>
             </SectionCard>
 
             <SectionCard
