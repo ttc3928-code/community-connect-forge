@@ -105,9 +105,31 @@ const Profile: React.FC = () => {
     );
   };
 
+  const digitCount = partnerPhone.replace(/\D/g, '').length;
+  const phoneError = !partnerPhone.trim()
+    ? 'Phone number is required for 1-tap SOS alerts.'
+    : !/^\+?[\d\s()\-.]+$/.test(partnerPhone.trim())
+      ? 'Only digits, spaces, +, -, ( ) and . are allowed.'
+      : digitCount < 7
+        ? 'Phone number is too short — include the area code.'
+        : digitCount > 15
+          ? 'Phone number is too long.'
+          : null;
+  const nameError = !partnerName.trim()
+    ? 'Partner name is required so the alert is personal.'
+    : partnerName.trim().length < 2
+      ? 'Enter at least 2 characters.'
+      : null;
+  const sosValid = !phoneError && !nameError;
+
+  const reminderError = !/^([01]\d|2[0-3]):[0-5]\d$/.test(reminderTime)
+    ? 'Pick a valid time (HH:MM).'
+    : null;
+
   const handleSaveSOS = () => {
-    if (partnerPhone && !/^[+\d][\d\s()\-.]{5,24}$/.test(partnerPhone.trim())) {
-      toast.error('Enter a valid phone number');
+    setSosTouched(true);
+    if (!sosValid) {
+      toast.error(nameError ?? phoneError ?? 'Check your emergency settings');
       return;
     }
     updateProfile.mutate(
@@ -117,7 +139,11 @@ const Profile: React.FC = () => {
         sos_attach_location: attachLocation,
       } as any,
       {
-        onSuccess: () => toast.success('Emergency settings saved'),
+        onSuccess: () => {
+          setSosSaved(true);
+          setTimeout(() => setSosSaved(false), 2500);
+          toast.success('Emergency settings saved');
+        },
         onError: () => toast.error('Could not save emergency settings'),
       },
     );
@@ -129,11 +155,26 @@ const Profile: React.FC = () => {
     ? `Hey ${partnerFallback}, I'm using the SOS tool on Iron Sharpens Iron. Facing a strong urge right now and need support. Location: ${sampleLocation}`
     : `Hey ${partnerFallback}, I'm using the SOS tool on Iron Sharpens Iron. Facing a strong urge right now and could use a quick call or text.`;
 
+  const handleTestSMS = () => {
+    const body = encodeURIComponent(`[TEST] ${smsPreview}`);
+    const to = phoneError ? '' : partnerPhone.trim().replace(/[^\d+]/g, '');
+    const separator = /iPhone|iPad|Macintosh/.test(navigator.userAgent) ? '&' : '?';
+    window.location.href = `sms:${to}${separator}body=${body}`;
+  };
+
   const handleSaveReminder = () => {
+    if (reminderError) {
+      toast.error(reminderError);
+      return;
+    }
     updatePrefs.mutate(
       { reminder_time: `${reminderTime}:00`, habit_reminders_enabled: true },
       {
-        onSuccess: () => toast.success(`Morning reminder set for ${reminderTime}`),
+        onSuccess: () => {
+          setReminderSaved(true);
+          setTimeout(() => setReminderSaved(false), 2500);
+          toast.success(`Morning reminder set for ${reminderTime}`);
+        },
         onError: () => toast.error('Could not save reminder time'),
       },
     );
