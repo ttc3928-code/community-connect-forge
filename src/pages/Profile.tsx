@@ -117,6 +117,12 @@ const Profile: React.FC = () => {
     );
   };
 
+  const partnerFallback = partnerName.trim() || 'Brother';
+  const sampleLocation = 'https://maps.google.com/?q=53.5461,-113.4938';
+  const smsPreview = attachLocation
+    ? `Hey ${partnerFallback}, I'm using the SOS tool on Iron Sharpens Iron. Facing a strong urge right now and need support. Location: ${sampleLocation}`
+    : `Hey ${partnerFallback}, I'm using the SOS tool on Iron Sharpens Iron. Facing a strong urge right now and could use a quick call or text.`;
+
   const handleSaveReminder = () => {
     updatePrefs.mutate(
       { reminder_time: `${reminderTime}:00`, habit_reminders_enabled: true },
