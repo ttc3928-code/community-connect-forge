@@ -430,11 +430,33 @@ const Profile: React.FC = () => {
                   type="time"
                   value={reminderTime}
                   onChange={(e) => setReminderTime(e.target.value)}
-                  className="max-w-40"
+                  aria-invalid={!!reminderError}
+                  className={`max-w-40 ${reminderError ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 />
+                {reminderError && (
+                  <p className="flex items-center gap-1.5 text-xs text-destructive">
+                    <AlertCircle className="h-3.5 w-3.5" />
+                    {reminderError}
+                  </p>
+                )}
               </div>
-              <Button onClick={handleSaveReminder} disabled={updatePrefs.isPending}>
-                Save Reminder Time
+              <Button
+                onClick={handleSaveReminder}
+                disabled={updatePrefs.isPending || !!reminderError}
+              >
+                {updatePrefs.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving…
+                  </>
+                ) : reminderSaved ? (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Saved
+                  </>
+                ) : (
+                  'Save Reminder Time'
+                )}
               </Button>
             </SectionCard>
 
