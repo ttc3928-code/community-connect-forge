@@ -395,7 +395,7 @@ const Profile: React.FC = () => {
                     'Save Emergency Settings'
                   )}
                 </Button>
-                <Button variant="outline" onClick={handleTestSMS}>
+                <Button variant="outline" onClick={openTestSmsConfirm}>
                   <Send className="mr-2 h-4 w-4" />
                   Send Test SMS to Myself/Partner
                 </Button>
