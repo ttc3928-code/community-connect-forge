@@ -83,6 +83,8 @@ const Profile: React.FC = () => {
   const [reminderTime, setReminderTime] = useState('07:00');
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState('');
+  const deleteAccountFn = useServerFn(deleteMyAccount);
+
   const [deleteStep, setDeleteStep] = useState<
     'idle' | 'deleting' | 'signing-out' | 'done'
   >('idle');
