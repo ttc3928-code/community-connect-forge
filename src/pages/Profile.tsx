@@ -192,13 +192,27 @@ const Profile: React.FC = () => {
   };
 
   const handleChangePassword = async () => {
-    if (!user?.email) return;
-    const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-    if (error) toast.error('Could not send reset email');
-    else toast.success('Password reset link sent to your email');
+    if (newPassword.length < 8) {
+      toast.error('Password must be at least 8 characters');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    setPwSaving(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setPwSaving(false);
+    if (error) {
+      toast.error(error.message || 'Could not update password');
+      return;
+    }
+    setNewPassword('');
+    setConfirmPassword('');
+    setPwOpen(false);
+    toast.success('Password updated');
   };
+
 
   const handleSignOut = async () => {
     await signOut();
