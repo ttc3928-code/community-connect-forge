@@ -83,6 +83,11 @@ const Profile: React.FC = () => {
   const [sosTouched, setSosTouched] = useState(false);
   const [sosSaved, setSosSaved] = useState(false);
   const [reminderSaved, setReminderSaved] = useState(false);
+  const [pwOpen, setPwOpen] = useState(false);
+  const [pwSaving, setPwSaving] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
 
   useEffect(() => {
     if (!profile) return;
