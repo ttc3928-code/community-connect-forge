@@ -157,10 +157,20 @@ const Profile: React.FC = () => {
     : `Hey ${partnerFallback}, I'm using the SOS tool on Iron Sharpens Iron. Facing a strong urge right now and could use a quick call or text.`;
 
   const handleTestSMS = () => {
+    setTestSmsOpen(false);
     const body = encodeURIComponent(`[TEST] ${smsPreview}`);
     const to = phoneError ? '' : partnerPhone.trim().replace(/[^\d+]/g, '');
     const separator = /iPhone|iPad|Macintosh/.test(navigator.userAgent) ? '&' : '?';
     window.location.href = `sms:${to}${separator}body=${body}`;
+  };
+
+  const openTestSmsConfirm = () => {
+    setSosTouched(true);
+    if (!sosValid) {
+      toast.error(nameError ?? phoneError ?? 'Check your emergency settings first');
+      return;
+    }
+    setTestSmsOpen(true);
   };
 
   const handleSaveReminder = () => {
