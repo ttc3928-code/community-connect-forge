@@ -320,10 +320,11 @@ const Profile: React.FC = () => {
                 <Button onClick={handleSaveAccount} disabled={updateProfile.isPending}>
                   Save Changes
                 </Button>
-                <Button variant="outline" onClick={handleChangePassword}>
+                <Button variant="outline" onClick={() => setPwOpen(true)}>
                   <KeyRound className="mr-2 h-4 w-4" />
                   Change Password
                 </Button>
+
                 <Button variant="ghost" onClick={handleSignOut}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Log Out
