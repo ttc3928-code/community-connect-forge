@@ -512,6 +512,47 @@ const Profile: React.FC = () => {
         </AlertDialogContent>
       </AlertDialog>
 
+      <AlertDialog open={testSmsOpen} onOpenChange={setTestSmsOpen}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Send test SMS?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Review the recipient and message below before opening your messaging app.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="rounded-lg border border-border bg-muted/30 p-3">
+              <p className="text-sm font-medium text-foreground">Recipient</p>
+              <p className="text-muted-foreground">
+                {partnerName.trim() || 'Brother'} — {partnerPhone.trim()}
+              </p>
+              <span className="mt-2 inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                {attachLocation ? 'With location' : 'No location'}
+              </span>
+            </div>
+            <div className="rounded-lg border border-primary/30 bg-slate-900/60 p-3">
+              <p className="mb-1 text-xs font-medium text-primary">Message preview</p>
+              <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                {smsPreview}
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              This will open your messaging app with the test payload. Standard messaging rates may
+              apply.
+            </p>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleTestSMS}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              Send Test SMS
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <Footer />
     </div>
   );
