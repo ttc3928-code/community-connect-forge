@@ -79,6 +79,7 @@ const Profile: React.FC = () => {
   const [attachLocation, setAttachLocation] = useState(false);
   const [reminderTime, setReminderTime] = useState('07:00');
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [testSmsOpen, setTestSmsOpen] = useState(false);
   const [sosTouched, setSosTouched] = useState(false);
   const [sosSaved, setSosSaved] = useState(false);
   const [reminderSaved, setReminderSaved] = useState(false);
@@ -156,10 +157,20 @@ const Profile: React.FC = () => {
     : `Hey ${partnerFallback}, I'm using the SOS tool on Iron Sharpens Iron. Facing a strong urge right now and could use a quick call or text.`;
 
   const handleTestSMS = () => {
+    setTestSmsOpen(false);
     const body = encodeURIComponent(`[TEST] ${smsPreview}`);
     const to = phoneError ? '' : partnerPhone.trim().replace(/[^\d+]/g, '');
     const separator = /iPhone|iPad|Macintosh/.test(navigator.userAgent) ? '&' : '?';
     window.location.href = `sms:${to}${separator}body=${body}`;
+  };
+
+  const openTestSmsConfirm = () => {
+    setSosTouched(true);
+    if (!sosValid) {
+      toast.error(nameError ?? phoneError ?? 'Check your emergency settings first');
+      return;
+    }
+    setTestSmsOpen(true);
   };
 
   const handleSaveReminder = () => {
@@ -384,7 +395,7 @@ const Profile: React.FC = () => {
                     'Save Emergency Settings'
                   )}
                 </Button>
-                <Button variant="outline" onClick={handleTestSMS}>
+                <Button variant="outline" onClick={openTestSmsConfirm}>
                   <Send className="mr-2 h-4 w-4" />
                   Send Test SMS to Myself/Partner
                 </Button>
@@ -496,6 +507,47 @@ const Profile: React.FC = () => {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Yes, delete everything
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={testSmsOpen} onOpenChange={setTestSmsOpen}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Send test SMS?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Review the recipient and message below before opening your messaging app.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="rounded-lg border border-border bg-muted/30 p-3">
+              <p className="text-sm font-medium text-foreground">Recipient</p>
+              <p className="text-muted-foreground">
+                {partnerName.trim() || 'Brother'} — {partnerPhone.trim()}
+              </p>
+              <span className="mt-2 inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                {attachLocation ? 'With location' : 'No location'}
+              </span>
+            </div>
+            <div className="rounded-lg border border-primary/30 bg-slate-900/60 p-3">
+              <p className="mb-1 text-xs font-medium text-primary">Message preview</p>
+              <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                {smsPreview}
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              This will open your messaging app with the test payload. Standard messaging rates may
+              apply.
+            </p>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleTestSMS}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              Send Test SMS
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
