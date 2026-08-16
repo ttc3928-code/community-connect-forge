@@ -256,24 +256,24 @@ const Profile: React.FC = () => {
   };
 
   const handleDeleteAccount = async () => {
-    if (!user) return;
+    if (!user || deleteConfirm.trim().toUpperCase() !== 'DELETE') return;
+    setDeleteStep('deleting');
     try {
-      await Promise.all([
-        supabase.from('journal_entries').delete().eq('user_id', user.id),
-        supabase.from('habit_completions').delete().eq('user_id', user.id),
-        supabase.from('habits').delete().eq('user_id', user.id),
-        supabase.from('notification_preferences').delete().eq('user_id', user.id),
-        supabase.from('push_subscriptions').delete().eq('user_id', user.id),
-      ]);
-      await supabase.from('profiles').delete().eq('user_id', user.id);
+      await deleteAccountFn();
+      setDeleteStep('signing-out');
       await signOut();
+      setDeleteStep('done');
       setDeleteOpen(false);
-      toast.success('Your data has been deleted');
+      toast.success('Your account and all data have been permanently deleted');
       navigate('/');
-    } catch {
-      toast.error('Could not delete account. Please try again.');
+    } catch (e) {
+      setDeleteStep('idle');
+      toast.error(
+        e instanceof Error ? e.message : 'Could not delete account. Please try again.',
+      );
     }
   };
+
 
   return (
     <div className="min-h-screen bg-background">
