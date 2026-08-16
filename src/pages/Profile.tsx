@@ -521,26 +521,63 @@ const Profile: React.FC = () => {
         )}
       </main>
 
-      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <AlertDialogContent>
+      <AlertDialog
+        open={deleteOpen}
+        onOpenChange={(open) => {
+          if (deleteStep !== 'idle') return;
+          setDeleteOpen(open);
+          if (!open) setDeleteConfirm('');
+        }}
+      >
+        <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle>Delete your account?</AlertDialogTitle>
             <AlertDialogDescription>
-              This permanently deletes your journal entries, habits, streaks, and
+              This permanently deletes your login, journal entries, habits, streaks, and
               settings. This cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="space-y-3 py-2">
+            <Label htmlFor="deleteConfirm">
+              Type <span className="font-mono font-bold text-destructive">DELETE</span> to confirm
+            </Label>
+            <Input
+              id="deleteConfirm"
+              value={deleteConfirm}
+              autoComplete="off"
+              disabled={deleteStep !== 'idle'}
+              onChange={(e) => setDeleteConfirm(e.target.value)}
+              placeholder="DELETE"
+            />
+            {deleteStep !== 'idle' && (
+              <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                {deleteStep === 'deleting'
+                  ? 'Deleting your data and account…'
+                  : deleteStep === 'signing-out'
+                    ? 'Signing you out…'
+                    : 'Done.'}
+              </div>
+            )}
+          </div>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
+            <AlertDialogCancel disabled={deleteStep !== 'idle'}>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
               onClick={handleDeleteAccount}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={deleteStep !== 'idle' || deleteConfirm.trim().toUpperCase() !== 'DELETE'}
             >
+              {deleteStep !== 'idle' ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="mr-2 h-4 w-4" />
+              )}
               Yes, delete everything
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
 
       <AlertDialog open={testSmsOpen} onOpenChange={setTestSmsOpen}>
         <AlertDialogContent className="max-w-md">
