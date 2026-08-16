@@ -83,6 +83,11 @@ const Profile: React.FC = () => {
   const [sosTouched, setSosTouched] = useState(false);
   const [sosSaved, setSosSaved] = useState(false);
   const [reminderSaved, setReminderSaved] = useState(false);
+  const [pwOpen, setPwOpen] = useState(false);
+  const [pwSaving, setPwSaving] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
 
   useEffect(() => {
     if (!profile) return;
@@ -192,13 +197,27 @@ const Profile: React.FC = () => {
   };
 
   const handleChangePassword = async () => {
-    if (!user?.email) return;
-    const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-    if (error) toast.error('Could not send reset email');
-    else toast.success('Password reset link sent to your email');
+    if (newPassword.length < 8) {
+      toast.error('Password must be at least 8 characters');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    setPwSaving(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setPwSaving(false);
+    if (error) {
+      toast.error(error.message || 'Could not update password');
+      return;
+    }
+    setNewPassword('');
+    setConfirmPassword('');
+    setPwOpen(false);
+    toast.success('Password updated');
   };
+
 
   const handleSignOut = async () => {
     await signOut();
@@ -301,10 +320,11 @@ const Profile: React.FC = () => {
                 <Button onClick={handleSaveAccount} disabled={updateProfile.isPending}>
                   Save Changes
                 </Button>
-                <Button variant="outline" onClick={handleChangePassword}>
+                <Button variant="outline" onClick={() => setPwOpen(true)}>
                   <KeyRound className="mr-2 h-4 w-4" />
                   Change Password
                 </Button>
+
                 <Button variant="ghost" onClick={handleSignOut}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Log Out
@@ -552,6 +572,50 @@ const Profile: React.FC = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AlertDialog open={pwOpen} onOpenChange={setPwOpen}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Change password</AlertDialogTitle>
+            <AlertDialogDescription>
+              Set a new password right here — no email link needed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">New password</Label>
+              <Input
+                id="newPassword"
+                type="password"
+                autoComplete="new-password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="At least 8 characters"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm new password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Re-enter password"
+              />
+            </div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={pwSaving}>Cancel</AlertDialogCancel>
+            <Button onClick={handleChangePassword} disabled={pwSaving}>
+              {pwSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Update Password
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+
 
       <Footer />
     </div>
