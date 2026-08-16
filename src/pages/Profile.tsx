@@ -44,6 +44,9 @@ import {
   useUpdateNotificationPreferences,
 } from '@/hooks/useNotificationPreferences';
 import { communityClient as supabase } from '@/lib/community-client';
+import { useServerFn } from '@tanstack/react-start';
+import { deleteMyAccount } from '@/lib/account.functions';
+
 
 const SectionCard: React.FC<{
   icon: React.ReactNode;
