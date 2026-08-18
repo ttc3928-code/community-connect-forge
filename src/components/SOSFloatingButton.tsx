@@ -23,9 +23,9 @@ export const SOSFloatingButton: React.FC = () => {
       type="button"
       onClick={openSOS}
       aria-label="Emergency help"
-      className="fixed bottom-5 right-5 z-[60] flex items-center gap-2 rounded-full bg-destructive px-4 py-3 text-sm font-semibold text-destructive-foreground shadow-lg shadow-destructive/30 transition-transform hover:scale-105 active:scale-95"
+      className="fixed bottom-5 right-5 z-[60] flex items-center gap-2 rounded-full bg-destructive px-4 py-3 text-sm font-semibold text-destructive-foreground shadow-lg shadow-destructive/30 transition-transform hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
-      <LifeBuoy className="h-5 w-5" />
+      <LifeBuoy className="h-5 w-5" aria-hidden="true" />
       <span className="hidden sm:inline">Emergency</span>
     </button>
   );
