@@ -14,8 +14,12 @@ import {
   MessageSquare,
   Trophy,
   X,
+  WifiOff,
+  CloudUpload,
 } from 'lucide-react';
 import { useCreateJournalEntry } from '@/hooks/useJournalEntries';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
+import { queueEntry, readQueue, clearQueue } from '@/lib/offlineQueue';
 
 interface SOSModalProps {
   open: boolean;
@@ -56,6 +60,7 @@ const PRAYER =
   'Father, I stand in Your strength, not my own. This urge has no authority over me — I belong to Christ. Amen.';
 
 const PARTNER_KEY = 'sos_accountability_partner';
+const LAST_VERSE_KEY = 'sos_last_verse';
 const TRIGGERS = ['Boredom', 'Stress', 'Anger', 'Fatigue', 'Loneliness', 'Late night'];
 
 const BOX_PHASES = [
@@ -130,13 +135,44 @@ export const SOSModal: React.FC<SOSModalProps> = ({ open, onOpenChange }) => {
   const [editContact, setEditContact] = useState(false);
 
   const createEntry = useCreateJournalEntry();
+  const online = useOnlineStatus();
+  const [pendingCount, setPendingCount] = useState(0);
   const initialized = useRef(false);
+
+  // Keep the last-used verse on disk so the Sword view still works with no network.
+  useEffect(() => {
+    if (!verse) return;
+    try {
+      localStorage.setItem(LAST_VERSE_KEY, JSON.stringify(verse));
+    } catch {
+      /* ignore */
+    }
+  }, [verse]);
+
+  useEffect(() => {
+    setPendingCount(readQueue().length);
+  }, [open]);
+
+  // Flush anything logged while offline once the connection returns.
+  useEffect(() => {
+    if (!online) return;
+    const queued = readQueue();
+    if (queued.length === 0) return;
+    clearQueue();
+    setPendingCount(0);
+    queued.forEach((q) =>
+      createEntry.mutate({ title: q.title, content: q.content, category: q.category }),
+    );
+    toast.success(`Back online — synced ${queued.length} saved ${queued.length === 1 ? 'entry' : 'entries'}.`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [online]);
 
   useEffect(() => {
     if (!open) return;
     setView('menu');
     setEditContact(false);
     setVerse(SWORD_VERSES[Math.floor(Math.random() * SWORD_VERSES.length)]);
+
 
     if (!initialized.current) {
       try {
@@ -161,6 +197,16 @@ export const SOSModal: React.FC<SOSModalProps> = ({ open, onOpenChange }) => {
 
 
   const logVictory = () => {
+    if (!navigator.onLine) {
+      queueEntry({
+        title: 'Victory in the moment',
+        content: `I hit the emergency button and chose God's way instead.\n\n"${verse.text}" — ${verse.reference}`,
+        category: 'Victory',
+      });
+      setPendingCount(readQueue().length);
+      toast.success("Saved on this device — it'll sync when you're back online.");
+      return;
+    }
     createEntry.mutate(
       {
         title: 'Victory in the moment',
@@ -175,6 +221,18 @@ export const SOSModal: React.FC<SOSModalProps> = ({ open, onOpenChange }) => {
   };
 
   const submitLog = () => {
+    if (!navigator.onLine) {
+      queueEntry({
+        title: `Trigger logged${trigger ? `: ${trigger}` : ''}`,
+        content: note || 'Logged during an emergency moment.',
+        category: 'Trigger',
+      });
+      setPendingCount(readQueue().length);
+      setNote('');
+      setTrigger(null);
+      setView('logged');
+      return;
+    }
     createEntry.mutate(
       {
         title: `Trigger logged${trigger ? `: ${trigger}` : ''}`,
@@ -222,6 +280,24 @@ export const SOSModal: React.FC<SOSModalProps> = ({ open, onOpenChange }) => {
             <X className="h-4 w-4" />
           </Button>
         </div>
+
+        {(!online || pendingCount > 0) && (
+          <div
+            role="status"
+            className="flex items-start gap-2 rounded-md border border-primary/30 bg-secondary/40 px-3 py-2 text-xs text-muted-foreground"
+          >
+            {online ? (
+              <CloudUpload className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            ) : (
+              <WifiOff className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            )}
+            <span>
+              {online
+                ? `${pendingCount} entry saved on this device is syncing.`
+                : "You're offline — the verse, breathing timer and call/text links still work. Anything you log is saved on this device and syncs later."}
+            </span>
+          </div>
+        )}
 
         <AnimatePresence mode="wait">
           <motion.div
