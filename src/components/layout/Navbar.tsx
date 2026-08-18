@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from '@/lib/router-compat';
 import { Button } from '@/components/ui/button';
 import { ShieldIcon } from '@/components/icons/ShieldIcon';
-import { Menu, X, Lock, LogOut, User, LifeBuoy, Settings, ChevronDown } from 'lucide-react';
+import { Menu, X, Lock, LogOut, User, Settings, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +14,6 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { useSOS } from '@/contexts/SOSContext';
 
 const publicNavLinks = [
   { label: 'Home', path: '/' },
@@ -32,7 +31,6 @@ export const Navbar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut, loading } = useAuth();
-  const { openSOS } = useSOS();
 
   const navLinks = user
     ? [
@@ -98,16 +96,6 @@ export const Navbar: React.FC = () => {
 
           {/* Auth Buttons */}
           <div className="flex items-center gap-2">
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={openSOS}
-              aria-label="Emergency help"
-              className="gap-1.5"
-            >
-              <LifeBuoy className="w-4 h-4" />
-              <span className="hidden sm:inline">Emergency</span>
-            </Button>
             {!loading && user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -190,14 +178,6 @@ export const Navbar: React.FC = () => {
                   </span>
                 </Link>
               ))}
-              <Button
-                variant="destructive"
-                className="w-full"
-                onClick={() => { setMobileMenuOpen(false); openSOS(); }}
-              >
-                <LifeBuoy className="w-4 h-4 mr-2" />
-                Emergency Need
-              </Button>
               <div className="pt-4 border-t border-border space-y-2">
                 {!loading && user ? (
                   <>
