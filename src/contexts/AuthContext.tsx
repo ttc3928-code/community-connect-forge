@@ -1,11 +1,14 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { communityClient as supabase } from '@/lib/community-client';
+import { PREVIEW_GUEST_MODE, GUEST_USER } from '@/lib/preview-mode';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  /** True when the session is the temporary preview guest, not a real login. */
+  isGuest: boolean;
   signUp: (email: string, password: string, displayName?: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -72,10 +75,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await supabase.auth.signOut();
   };
 
+  // TEMPORARY: preview guest access. See src/lib/preview-mode.ts
+  const isGuest = PREVIEW_GUEST_MODE && !loading && !user;
+  const effectiveUser = isGuest ? (GUEST_USER as unknown as User) : user;
+
   const value = {
-    user,
+    user: effectiveUser,
     session,
     loading,
+    isGuest,
     signUp,
     signIn,
     signOut,
