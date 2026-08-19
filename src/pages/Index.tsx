@@ -24,7 +24,7 @@ const Index = () => {
   const featuresRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
+  const { user, loading, isGuest } = useAuth();
 
   const scrollToFeatures = () => {
     featuresRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -85,7 +85,7 @@ const Index = () => {
   };
 
   // Signed-in users go straight to their daily routine
-  if (!loading && user) {
+  if (!loading && user && !isGuest) {
     return <Navigate to="/dashboard" replace />;
   }
 
