@@ -108,7 +108,7 @@ const Profile: React.FC = () => {
   }, [profile]);
 
   useEffect(() => {
-    if (prefs?.reminder_time) setReminderTime(prefs.reminder_time.slice(0, 5));
+    if (prefs?.reminder_time) setReminderTime(utcTimeToLocal(prefs.reminder_time));
   }, [prefs]);
 
   const handleSaveAccount = () => {
