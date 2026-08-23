@@ -467,6 +467,9 @@ const Profile: React.FC = () => {
             >
               <div className="space-y-2">
                 <Label htmlFor="reminderTime">Daily Surrender Morning Reminder</Label>
+                <p className="text-xs text-muted-foreground">
+                  Shown in your local time ({getLocalTimeZoneLabel()})
+                </p>
                 <Input
                   id="reminderTime"
                   type="time"
