@@ -14,6 +14,7 @@ import {
   useSendTestNotification
 } from '@/hooks/useNotificationPreferences';
 import { useToast } from '@/hooks/use-toast';
+import { utcTimeToLocal, localTimeToUtc, getLocalTimeZoneLabel } from '@/lib/timezone';
 const NotificationSettings = () => {
   const { data: preferences, isLoading } = useNotificationPreferences();
   const { data: pushStatus, isLoading: isPushStatusLoading } = usePushSubscriptionStatus();
@@ -29,7 +30,7 @@ const NotificationSettings = () => {
   useEffect(() => {
     if (preferences) {
       setHabitRemindersEnabled(preferences.habit_reminders_enabled);
-      setReminderTime(preferences.reminder_time.slice(0, 5)); // Format HH:MM
+      setReminderTime(utcTimeToLocal(preferences.reminder_time)); // local HH:MM
     }
   }, [preferences]);
 
@@ -54,10 +55,10 @@ const NotificationSettings = () => {
 
   const handleTimeChange = async () => {
     try {
-      await updatePreferences.mutateAsync({ reminder_time: `${reminderTime}:00` });
+      await updatePreferences.mutateAsync({ reminder_time: localTimeToUtc(reminderTime) });
       toast({
         title: 'Reminder Time Updated',
-        description: `Daily reminders will be sent at ${reminderTime} UTC`,
+        description: `Daily reminders will be sent at ${reminderTime} (${getLocalTimeZoneLabel()})`,
       });
     } catch (error) {
       toast({
@@ -176,7 +177,7 @@ const NotificationSettings = () => {
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-muted-foreground" />
             <Label htmlFor="reminder-time" className="text-base font-medium">
-              Reminder Time (UTC)
+              Reminder Time ({getLocalTimeZoneLabel()})
             </Label>
           </div>
           <div className="flex items-center gap-3">
