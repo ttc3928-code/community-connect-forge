@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { utcTimeToLocal, localTimeToUtc, getLocalTimeZoneLabel } from '@/lib/timezone';
+import { sanitizePhoneInput, validatePhone, countPhoneDigits, toDialable, MIN_PHONE_DIGITS, MAX_PHONE_DIGITS } from '@/lib/phone';
 import {
   User,
   Mail,
@@ -122,16 +123,8 @@ const Profile: React.FC = () => {
     );
   };
 
-  const digitCount = partnerPhone.replace(/\D/g, '').length;
-  const phoneError = !partnerPhone.trim()
-    ? 'Phone number is required for 1-tap SOS alerts.'
-    : !/^\+?[\d\s()\-.]+$/.test(partnerPhone.trim())
-      ? 'Only digits, spaces, +, -, ( ) and . are allowed.'
-      : digitCount < 7
-        ? 'Phone number is too short — include the area code.'
-        : digitCount > 15
-          ? 'Phone number is too long.'
-          : null;
+  const digitCount = countPhoneDigits(partnerPhone);
+  const phoneError = validatePhone(partnerPhone);
   const nameError = !partnerName.trim()
     ? 'Partner name is required so the alert is personal.'
     : partnerName.trim().length < 2
@@ -175,7 +168,7 @@ const Profile: React.FC = () => {
   const handleTestSMS = () => {
     setTestSmsOpen(false);
     const body = encodeURIComponent(`[TEST] ${smsPreview}`);
-    const to = phoneError ? '' : partnerPhone.trim().replace(/[^\d+]/g, '');
+    const to = phoneError ? '' : toDialable(partnerPhone);
     const separator = /iPhone|iPad|Macintosh/.test(navigator.userAgent) ? '&' : '?';
     window.location.href = `sms:${to}${separator}body=${body}`;
   };
@@ -376,7 +369,8 @@ const Profile: React.FC = () => {
                     value={partnerPhone}
                     maxLength={25}
                     onBlur={() => setSosTouched(true)}
-                    onChange={(e) => setPartnerPhone(e.target.value)}
+                    inputMode="tel"
+                    onChange={(e) => setPartnerPhone(sanitizePhoneInput(e.target.value))}
                     placeholder="+1 555 123 4567"
                     aria-invalid={sosTouched && !!phoneError}
                     className={sosTouched && phoneError ? 'border-destructive focus-visible:ring-destructive' : ''}
@@ -388,7 +382,7 @@ const Profile: React.FC = () => {
                     </p>
                   ) : (
                     <p className="text-xs text-muted-foreground">
-                      Include country/area code, e.g. +1 555 123 4567.
+                      Include country/area code, e.g. +1 555 123 4567. {digitCount}/{MAX_PHONE_DIGITS} digits (min {MIN_PHONE_DIGITS}).
                     </p>
                   )}
                 </div>
