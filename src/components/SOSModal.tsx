@@ -20,6 +20,7 @@ import {
 import { useCreateJournalEntry } from '@/hooks/useJournalEntries';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { queueEntry, readQueue, clearQueue } from '@/lib/offlineQueue';
+import { sanitizePhoneInput, toDialable, validatePhone } from '@/lib/phone';
 
 interface SOSModalProps {
   open: boolean;
@@ -380,13 +381,13 @@ export const SOSModal: React.FC<SOSModalProps> = ({ open, onOpenChange }) => {
                 </p>
                 {partner.phone ? (
                   <div className="space-y-3">
-                    <a href={`tel:${partner.phone}`} className="block">
+                    <a href={`tel:${toDialable(partner.phone)}`} className="block">
                       <Button className="w-full h-14 gap-2">
                         <Phone className="h-5 w-5" /> Call {partner.name || 'your brother'} (Accountability Partner)
                       </Button>
                     </a>
                     <a
-                      href={`sms:${partner.phone}?&body=${encodeURIComponent(
+                      href={`sms:${toDialable(partner.phone)}?&body=${encodeURIComponent(
                         "Emergency check-in: I'm in the fight right now and need prayer. Can you talk?",
                       )}`}
                       className="block"
@@ -421,9 +422,17 @@ export const SOSModal: React.FC<SOSModalProps> = ({ open, onOpenChange }) => {
                       placeholder="Phone number"
                       inputMode="tel"
                       value={partner.phone}
-                      onChange={(e) => setPartner((p) => ({ ...p, phone: e.target.value }))}
+                      onChange={(e) => setPartner((p) => ({ ...p, phone: sanitizePhoneInput(e.target.value) }))}
                     />
-                    <Button variant="outline" className="w-full" onClick={savePartner}>
+                    {validatePhone(partner.phone) && partner.phone ? (
+                      <p className="text-xs text-destructive">{validatePhone(partner.phone)}</p>
+                    ) : null}
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={savePartner}
+                      disabled={!!validatePhone(partner.phone) || !partner.name.trim()}
+                    >
                       Save contact
                     </Button>
                   </div>
