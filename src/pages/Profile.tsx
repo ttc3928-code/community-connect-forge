@@ -19,6 +19,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
+import { utcTimeToLocal, localTimeToUtc, getLocalTimeZoneLabel } from '@/lib/timezone';
 import {
   User,
   Mail,
@@ -108,7 +109,7 @@ const Profile: React.FC = () => {
   }, [profile]);
 
   useEffect(() => {
-    if (prefs?.reminder_time) setReminderTime(prefs.reminder_time.slice(0, 5));
+    if (prefs?.reminder_time) setReminderTime(utcTimeToLocal(prefs.reminder_time));
   }, [prefs]);
 
   const handleSaveAccount = () => {
@@ -194,12 +195,12 @@ const Profile: React.FC = () => {
       return;
     }
     updatePrefs.mutate(
-      { reminder_time: `${reminderTime}:00`, habit_reminders_enabled: true },
+      { reminder_time: localTimeToUtc(reminderTime), habit_reminders_enabled: true },
       {
         onSuccess: () => {
           setReminderSaved(true);
           setTimeout(() => setReminderSaved(false), 2500);
-          toast.success(`Morning reminder set for ${reminderTime}`);
+          toast.success(`Morning reminder set for ${reminderTime} (${getLocalTimeZoneLabel()})`);
         },
         onError: () => toast.error('Could not save reminder time'),
       },
@@ -466,6 +467,9 @@ const Profile: React.FC = () => {
             >
               <div className="space-y-2">
                 <Label htmlFor="reminderTime">Daily Surrender Morning Reminder</Label>
+                <p className="text-xs text-muted-foreground">
+                  Shown in your local time ({getLocalTimeZoneLabel()})
+                </p>
                 <Input
                   id="reminderTime"
                   type="time"
