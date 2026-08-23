@@ -48,3 +48,29 @@ export const toDialable = (value: string): string => {
   const plus = trimmed.startsWith('+') ? '+' : '';
   return plus + trimmed.replace(/\D/g, '');
 };
+
+/**
+ * Human-readable display formatting. Normalized storage stays digits-only
+ * (with optional leading "+") via toDialable().
+ */
+export const formatPhoneDisplay = (value: string): string => {
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  const hadPlus = trimmed.startsWith('+');
+  const digits = trimmed.replace(/\D/g, '');
+  if (!digits) return '';
+
+  // North American: 10 digits, or 11 starting with 1
+  if (digits.length === 10) {
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+  }
+  if (digits.length === 11 && digits.startsWith('1')) {
+    return `+1 (${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7)}`;
+  }
+
+  // International: group the subscriber part in 3s after a 1-3 digit country code
+  const ccLength = digits.length > 11 ? 3 : 2;
+  const cc = digits.slice(0, ccLength);
+  const rest = digits.slice(ccLength).replace(/(\d{3})(?=\d)/g, '$1 ');
+  return `${hadPlus || digits.length > 10 ? '+' : ''}${cc} ${rest}`.trim();
+};
