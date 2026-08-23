@@ -424,7 +424,15 @@ export const SOSModal: React.FC<SOSModalProps> = ({ open, onOpenChange }) => {
                       value={partner.phone}
                       onChange={(e) => setPartner((p) => ({ ...p, phone: sanitizePhoneInput(e.target.value) }))}
                     />
-                    <Button variant="outline" className="w-full" onClick={savePartner}>
+                    {validatePhone(partner.phone) && partner.phone ? (
+                      <p className="text-xs text-destructive">{validatePhone(partner.phone)}</p>
+                    ) : null}
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={savePartner}
+                      disabled={!!validatePhone(partner.phone) || !partner.name.trim()}
+                    >
                       Save contact
                     </Button>
                   </div>
