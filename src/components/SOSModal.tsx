@@ -20,7 +20,7 @@ import {
 import { useCreateJournalEntry } from '@/hooks/useJournalEntries';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { queueEntry, readQueue, clearQueue } from '@/lib/offlineQueue';
-import { sanitizePhoneInput, toDialable, validatePhone } from '@/lib/phone';
+import { sanitizePhoneInput, toDialable, validatePhone, formatPhoneDisplay } from '@/lib/phone';
 
 interface SOSModalProps {
   open: boolean;
@@ -188,7 +188,9 @@ export const SOSModal: React.FC<SOSModalProps> = ({ open, onOpenChange }) => {
 
   const savePartner = () => {
     try {
-      localStorage.setItem(PARTNER_KEY, JSON.stringify(partner));
+      const normalized = { ...partner, phone: toDialable(partner.phone) };
+      localStorage.setItem(PARTNER_KEY, JSON.stringify(normalized));
+      setPartner({ ...normalized, phone: formatPhoneDisplay(normalized.phone) });
       setEditContact(false);
       toast.success('Accountability contact saved');
     } catch {
@@ -423,6 +425,12 @@ export const SOSModal: React.FC<SOSModalProps> = ({ open, onOpenChange }) => {
                       inputMode="tel"
                       value={partner.phone}
                       onChange={(e) => setPartner((p) => ({ ...p, phone: sanitizePhoneInput(e.target.value) }))}
+                      onBlur={() =>
+                        setPartner((p) => ({
+                          ...p,
+                          phone: validatePhone(p.phone) ? p.phone : formatPhoneDisplay(p.phone),
+                        }))
+                      }
                     />
                     {validatePhone(partner.phone) && partner.phone ? (
                       <p className="text-xs text-destructive">{validatePhone(partner.phone)}</p>

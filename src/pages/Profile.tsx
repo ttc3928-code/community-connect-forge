@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { utcTimeToLocal, localTimeToUtc, getLocalTimeZoneLabel } from '@/lib/timezone';
-import { sanitizePhoneInput, validatePhone, countPhoneDigits, toDialable, MIN_PHONE_DIGITS, MAX_PHONE_DIGITS } from '@/lib/phone';
+import { sanitizePhoneInput, validatePhone, countPhoneDigits, toDialable, formatPhoneDisplay, MIN_PHONE_DIGITS, MAX_PHONE_DIGITS } from '@/lib/phone';
 import {
   User,
   Mail,
@@ -105,7 +105,7 @@ const Profile: React.FC = () => {
     if (!profile) return;
     setDisplayName(profile.display_name ?? '');
     setPartnerName((profile as any).partner_name ?? '');
-    setPartnerPhone((profile as any).partner_phone ?? '');
+    setPartnerPhone(formatPhoneDisplay((profile as any).partner_phone ?? ''));
     setAttachLocation(Boolean((profile as any).sos_attach_location));
   }, [profile]);
 
@@ -145,7 +145,7 @@ const Profile: React.FC = () => {
     updateProfile.mutate(
       {
         partner_name: partnerName.trim() || null,
-        partner_phone: partnerPhone.trim() || null,
+        partner_phone: toDialable(partnerPhone) || null,
         sos_attach_location: attachLocation,
       } as any,
       {
@@ -348,7 +348,10 @@ const Profile: React.FC = () => {
                     id="partnerName"
                     value={partnerName}
                     maxLength={60}
-                    onBlur={() => setSosTouched(true)}
+                    onBlur={() => {
+                      setSosTouched(true);
+                      setPartnerPhone((v) => (validatePhone(v) ? v : formatPhoneDisplay(v)));
+                    }}
                     onChange={(e) => setPartnerName(e.target.value)}
                     placeholder="John"
                     aria-invalid={sosTouched && !!nameError}
@@ -368,7 +371,10 @@ const Profile: React.FC = () => {
                     type="tel"
                     value={partnerPhone}
                     maxLength={25}
-                    onBlur={() => setSosTouched(true)}
+                    onBlur={() => {
+                      setSosTouched(true);
+                      setPartnerPhone((v) => (validatePhone(v) ? v : formatPhoneDisplay(v)));
+                    }}
                     inputMode="tel"
                     onChange={(e) => setPartnerPhone(sanitizePhoneInput(e.target.value))}
                     placeholder="+1 555 123 4567"
