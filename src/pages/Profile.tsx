@@ -195,12 +195,12 @@ const Profile: React.FC = () => {
       return;
     }
     updatePrefs.mutate(
-      { reminder_time: `${reminderTime}:00`, habit_reminders_enabled: true },
+      { reminder_time: localTimeToUtc(reminderTime), habit_reminders_enabled: true },
       {
         onSuccess: () => {
           setReminderSaved(true);
           setTimeout(() => setReminderSaved(false), 2500);
-          toast.success(`Morning reminder set for ${reminderTime}`);
+          toast.success(`Morning reminder set for ${reminderTime} (${getLocalTimeZoneLabel()})`);
         },
         onError: () => toast.error('Could not save reminder time'),
       },
