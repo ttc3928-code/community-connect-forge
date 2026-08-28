@@ -260,6 +260,7 @@ const Auth = () => {
                   className="w-full"
                   onClick={handleGoogle}
                   disabled={googleLoading}
+                  aria-busy={googleLoading}
                 >
                   {googleLoading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -271,8 +272,18 @@ const Auth = () => {
                       <path fill="#EA4335" d="M12 4.7c2.3 0 3.9 1 4.8 1.9l3.5-3.4C18 1.2 15.3 0 12 0A12 12 0 0 0 1.2 6.6l3.9 3.1A7.3 7.3 0 0 1 12 4.7Z" />
                     </svg>
                   )}
-                  Continue with Google
+                  {googleLoading ? 'Connecting to Google...' : 'Continue with Google'}
                 </Button>
+
+                {googleError && (
+                  <div
+                    role="alert"
+                    className="rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+                  >
+                    <p className="font-medium mb-0.5">Couldn't sign in with Google</p>
+                    <p className="text-destructive/80">{googleError}</p>
+                  </div>
+                )}
               </>
             )}
 
