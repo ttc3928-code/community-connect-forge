@@ -72,22 +72,53 @@ const Auth = () => {
     }
   };
 
+  const [googleError, setGoogleError] = useState<string | null>(null);
+
+  const describeGoogleError = (message?: string): string => {
+    const msg = (message || '').toLowerCase();
+    if (msg.includes('popup') && (msg.includes('closed') || msg.includes('cancel'))) {
+      return 'The Google sign-in window was closed before finishing. No account was signed in — try again when you\'re ready.';
+    }
+    if (msg.includes('popup') || msg.includes('blocked')) {
+      return 'Your browser blocked the sign-in popup. Allow popups for this site, then try again.';
+    }
+    if (msg.includes('cancel')) {
+      return 'Google sign-in was cancelled.';
+    }
+    if (msg.includes('network') || msg.includes('fetch') || msg.includes('offline')) {
+      return 'Couldn\'t reach Google. Check your internet connection and try again.';
+    }
+    if (msg.includes('provider') || msg.includes('unsupported')) {
+      return 'Google sign-in isn\'t available right now. Please use email sign-in or try again later.';
+    }
+    return message
+      ? `Google sign-in failed: ${message}`
+      : 'Google sign-in failed. Please try again, or use email sign-in below.';
+  };
+
   const handleGoogle = async () => {
+    if (googleLoading) return; // guard against double-taps
     setGoogleLoading(true);
+    setGoogleError(null);
+    const fail = (message?: string) => {
+      const friendly = describeGoogleError(message);
+      setGoogleError(friendly);
+      toast.error(friendly);
+      setGoogleLoading(false);
+    };
     try {
       const result = await lovable.auth.signInWithOAuth('google', {
         redirect_uri: window.location.origin,
       });
       if (result.error) {
-        toast.error(result.error.message || 'Google sign-in failed');
-        setGoogleLoading(false);
+        fail(result.error.message);
         return;
       }
-      if (result.redirected) return;
+      if (result.redirected) return; // navigating to Google — keep the spinner
+      toast.success('Signed in with Google. Welcome!');
       navigate('/dashboard');
-    } catch {
-      toast.error('Google sign-in failed');
-      setGoogleLoading(false);
+    } catch (error) {
+      fail(error instanceof Error ? error.message : undefined);
     }
   };
 
@@ -229,6 +260,7 @@ const Auth = () => {
                   className="w-full"
                   onClick={handleGoogle}
                   disabled={googleLoading}
+                  aria-busy={googleLoading}
                 >
                   {googleLoading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -240,8 +272,18 @@ const Auth = () => {
                       <path fill="#EA4335" d="M12 4.7c2.3 0 3.9 1 4.8 1.9l3.5-3.4C18 1.2 15.3 0 12 0A12 12 0 0 0 1.2 6.6l3.9 3.1A7.3 7.3 0 0 1 12 4.7Z" />
                     </svg>
                   )}
-                  Continue with Google
+                  {googleLoading ? 'Connecting to Google...' : 'Continue with Google'}
                 </Button>
+
+                {googleError && (
+                  <div
+                    role="alert"
+                    className="rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+                  >
+                    <p className="font-medium mb-0.5">Couldn't sign in with Google</p>
+                    <p className="text-destructive/80">{googleError}</p>
+                  </div>
+                )}
               </>
             )}
 
